@@ -160,6 +160,7 @@ resource "azurerm_virtual_machine" "main" {
     computer_name  = "${var.labelPrefix}-A05-VM"
     admin_username = var.admin_username
     admin_password = null
+    custom_data    = base64encode(data.cloudinit_config.main.rendered)
   }
 
   os_profile_linux_config {
@@ -168,6 +169,5 @@ resource "azurerm_virtual_machine" "main" {
       key_data = file("~/.ssh/id_rsa.pub")
       path     = "/home/${var.admin_username}/.ssh/authorized_keys"
     }
-    custom_data = base64encode(data.cloudinit_config.main.rendered)
   }
 }
