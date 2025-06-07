@@ -133,3 +133,42 @@ data "cloudinit_config" "main" {
     content      = file("${path.module}/init.sh")
   }
 }
+
+#  last step： Virtual Machine
+resource "azurerm_virtual_machine" "main" {
+  name                  = "${var.labelPrefix}-A05-VM"
+  location              = var.region
+  resource_group_name   = azurerm_resource_group.main.name
+  vm_size               = "Standard_B1s"
+  network_interface_ids = [azurerm_network_interface.main.id]
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts"
+    version   = "latest"
+  }
+
+  storage_os_disk {
+    name              = "${var.labelPrefix}-A05-OSDisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "${var.labelPrefix}-A05-VM"
+    admin_username = var.admin_username
+    admin_password = null  # 不使用密码，改为 SSH 密钥
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = true
+    ssh_keys {
+      key_data = file("~/.ssh/id_rsa.pub")  # 替换为你的 SSH 公钥路径
+      path     = "/home/${var.admin_username}/.ssh/authorized_keys"
+    }
+  }
+
+  user_data = data.cloudinit_config.main.rendered  # 关联 cloudinit 脚本
+}
