@@ -170,5 +170,5 @@ resource "azurerm_virtual_machine" "main" {
     }
   }
 
-  user_data = data.cloudinit_config.main.rendered  # 关联 cloudinit 脚本
+  custom_data = data.cloudinit_config.main.rendered 
 }
