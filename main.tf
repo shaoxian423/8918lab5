@@ -122,3 +122,14 @@ resource "azurerm_network_interface_security_group_association" "main" {
   network_interface_id      = azurerm_network_interface.main.id
   network_security_group_id = azurerm_network_security_group.main.id
 }
+
+# Cloudinit Configuration
+data "cloudinit_config" "main" {
+  gzip          = false
+  base64_encode = false
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/init.sh")
+  }
+}
