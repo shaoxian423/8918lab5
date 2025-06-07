@@ -17,10 +17,33 @@ terraform {
 
 # Define providers and their config params
 provider "azurerm" {
-  # Leave the features block empty to accept all defaults
   features {}
 }
 
 provider "cloudinit" {
   # Configuration options
+}
+
+# Variables
+variable "labelPrefix" {
+  description = "Your college username, used as a prefix for resource names"
+  type        = string
+}
+
+variable "region" {
+  description = "Azure region for resource deployment"
+  type        = string
+  default     = "eastus"
+}
+
+variable "admin_username" {
+  description = "Admin username for the VM"
+  type        = string
+  default     = "azureadmin"
+}
+
+# Resource Group
+resource "azurerm_resource_group" "main" {
+  name     = "${var.labelPrefix}-A05-RG"
+  location = var.region
 }
