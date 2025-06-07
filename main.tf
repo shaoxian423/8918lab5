@@ -134,7 +134,7 @@ data "cloudinit_config" "main" {
   }
 }
 
-#  last step： Virtual Machine
+# Virtual Machine
 resource "azurerm_virtual_machine" "main" {
   name                  = "${var.labelPrefix}-A05-VM"
   location              = var.region
@@ -159,16 +159,15 @@ resource "azurerm_virtual_machine" "main" {
   os_profile {
     computer_name  = "${var.labelPrefix}-A05-VM"
     admin_username = var.admin_username
-    admin_password = null  # 不使用密码，改为 SSH 密钥
+    admin_password = null
   }
 
   os_profile_linux_config {
     disable_password_authentication = true
     ssh_keys {
-      key_data = file("~/.ssh/id_rsa.pub")  # 替换为你的 SSH 公钥路径
+      key_data = file("~/.ssh/id_rsa.pub")
       path     = "/home/${var.admin_username}/.ssh/authorized_keys"
     }
+    custom_data = base64encode(data.cloudinit_config.main.rendered)
   }
-
-  custom_data = data.cloudinit_config.main.rendered 
 }
